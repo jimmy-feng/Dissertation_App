@@ -11,7 +11,6 @@ flask==1.1.2
 flask-compress==1.11
 #gdal==3.2.1
 geopandas==0.8.1
-#geopandas-base==0.10.2
 gunicorn==20.1.0
 itsdangerous==1.1.0
 jinja2==2.11.3
@@ -19,7 +18,6 @@ leafmap==0.7.8
 markupsafe==1.1.1
 movingpandas==0.9rc3
 numpy==1.21.5
-numpy-base==1.21.5
 pandas==1.2.3
 pip==19.2.3
 plotly==5.6.0
