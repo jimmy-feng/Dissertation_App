@@ -149,7 +149,7 @@ individuals['VirtualOpp'] = individuals['VirtualOpp'].replace(np.nan, 0)
 # hybrid_opp_total_all = len(hybrid_pluscode)
 
 # Main trajectory stops
-traj_simple = pd.read_csv('./Data/Scenarios_Synthetic_Data.csv')
+#traj_simple = pd.read_csv('./Data/Scenarios_Synthetic_Data.csv')
 
 # Main and travel trajectory stops (inclusive of every street)
 traj = pd.read_csv('./Data/Scenarios_Synthetic_Data_Trajectories.csv', index_col=0)
