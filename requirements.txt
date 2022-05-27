@@ -11,7 +11,7 @@ flask==1.1.2
 flask-compress==1.11
 #gdal==3.2.1
 geopandas==0.8.1
-geopandas-base==0.10.2
+#geopandas-base==0.10.2
 gunicorn==20.1.0
 itsdangerous==1.1.0
 jinja2==2.11.3
