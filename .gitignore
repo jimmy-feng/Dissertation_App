@@ -1,0 +1,4 @@
+Dissertation_App
+*.pyc
+.DS_Store
+.env
