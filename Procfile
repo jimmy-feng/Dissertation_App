@@ -1,1 +1,1 @@
-web: gunicorn Visualize_POI_Dash:server --timeout 30 --keep-alive 5 --log-level debug
+web: gunicorn Visualize_POI_Dash:server --timeout 120
