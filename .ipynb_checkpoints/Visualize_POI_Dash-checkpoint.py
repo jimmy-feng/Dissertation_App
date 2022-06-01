@@ -11,8 +11,8 @@ import re
 import json
 from datetime import timedelta
 import dash_datetimepicker
-import leafmap.plotlymap as leafmap
-from leafmap import plotlymap
+#import leafmap.plotlymap as leafmap
+#from leafmap import plotlymap
 import dash_bootstrap_components as dbc
 import numpy as np
 import dash_cytoscape as cyto
@@ -149,7 +149,7 @@ individuals['VirtualOpp'] = individuals['VirtualOpp'].replace(np.nan, 0)
 # hybrid_opp_total_all = len(hybrid_pluscode)
 
 # Main trajectory stops
-traj_simple = pd.read_csv('./Data/Scenarios_Synthetic_Data.csv')
+#traj_simple = pd.read_csv('./Data/Scenarios_Synthetic_Data.csv')
 
 # Main and travel trajectory stops (inclusive of every street)
 traj = pd.read_csv('./Data/Scenarios_Synthetic_Data_Trajectories.csv', index_col=0)
@@ -213,6 +213,28 @@ knox_Z = []
 knox_Z += len(knox_X) * [dt(2022, 3, 10, 23, 59, 59)]
 
 knox_bg = gpd.read_file('./Data/Knox_County_BG_Census.shp')
+
+# Scale percentage values between 0 - 100
+knox_bg_columns=['Unemply',
+                 'NHSDplm',
+                 'Ag65Old',
+                 'Ag17Yng',
+                 'DisblHH',
+                 'SinglHH',
+                 'Minorty',
+                 'PrEngls',
+                 'MltUnts',
+                 'MobilHm',
+                 'Crowdng',
+                 'NoVehcl',
+                 'GropQrt',
+                 'SNAPBnf',
+                 'NoCmptr',
+                 'NIntrnt']
+
+for c in knox_bg_columns:
+    knox_bg[c] = knox_bg[c] * 100
+
 knox_bg.rename(columns={'TotlPpE': 'Population',
                         'Incm_ME': 'Median Income $', 
                         'Unemply': 'Unemployment %',
@@ -233,6 +255,8 @@ knox_bg.rename(columns={'TotlPpE': 'Population',
                         'NIntrnt': 'People without Internet %'},
                         inplace=True
               )
+
+
 
 # Retrieve columns of Census data that users can select to visualize in a choropleth map
 # Also add space-time prisms to 2-D Map
@@ -287,8 +311,14 @@ def create_2d_map(choropleth_z, individuals_df, trajectories_df, stores_df, pris
     ## 2-D MAP
     
     # Instantiate Map object built off of Plotly.graph_objects
-    map_2 = leafmap.Map(center=(35.9875, -83.9420), zoom=8, basemap="open-street-map")
-    map_2.update_layout(font=dict(family="Roboto"))
+    map_2 = go.Figure(go.Scattermapbox())
+    #map_2 = leafmap.Map(center=(35.9875, -83.9420), zoom=8, basemap="open-street-map")
+    map_2.update_layout(
+        font=dict(family="Roboto"),
+        mapbox_center=go.layout.mapbox.Center(lat=35.9875, lon=-83.9420),
+        mapbox_zoom=8,
+        #basemap='open-street-map'
+    )
     # Add Choropleth layer
     if choropleth_z != 'Select Block Group Choropleth Layer':
         
@@ -319,9 +349,10 @@ def create_2d_map(choropleth_z, individuals_df, trajectories_df, stores_df, pris
                         colorbar_y = 0,
                         colorbar_x = 0.3,
                         name=choropleth_z,
+                        marker_opacity=0.5
                         #hovertemplate = '<br><b> ST-Prism:</b><extra></extra>%{text}',
         ))
-        map_2.set_layer_opacity(choropleth_z, opacity = 0.5)
+        #map_2.set_layer_opacity(choropleth_z, opacity = 0.5)
         
     # Set layout parameters
     map_2.update_layout(
@@ -860,7 +891,7 @@ app.layout = dbc.Container([
             html.P("This is a demo of an interactive GIS where you can examine movements over space-time of synthetic people, visualize food opportunities relative to locations of people and their daily travels, query food stores based on different characteristics perceived as desirable, visualize different census variables depicting social vulnerability and socioeconomic characteristics of block groups in Knox County, Tennessee, and identify the food opportunities accessible to people along different shopping modalities.", style={'font-family': 'Roboto'})
         ], width = 8),
         dbc.Col([
-            dbc.CardHeader(html.H5(f"Accessible Opportunities | Total: {len(stores) + virtual_opp_total_all}", style={'textAlign': 'center', 'margin-top': '10px'})),
+            dbc.CardHeader(html.H5(f"Total Food Stores | {len(stores) + virtual_opp_total_all}", style={'textAlign': 'center', 'margin-top': '10px'})),
             dbc.CardGroup(
                     [
                         dbc.Card(
@@ -1104,6 +1135,7 @@ app.layout = dbc.Container([
         ], width = 6, style={'border': '1px solid', 'height': '59vh', 'display': 'inline-block', 'align-items': 'center', 'justify-content': 'space-evenly'}),
         
         dbc.Col([
+            html.H5('Socioeconomic, Demographic, and Perceived Data Tables', style={'textAlign': 'center', 'margin': '3px 0px 0px 0px'}),
             dcc.Tabs([
                 dcc.Tab(label='Table: Individuals',
                         style=tab_style,

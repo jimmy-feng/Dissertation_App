@@ -1,0 +1,837 @@
+CONTENTS OF THIS FILE
+=====================
+
+ * Introduction
+ * Data Entry Notes
+ * Data Dictionary
+
+
+INTRODUCTION
+============
+
+This document serves as a data dictionary and details the data
+attributes of interest for the Human Dynamics of Scientific Knowledge
+project.
+
+Lead researchers (alphetical order by last name): Shih-Lung Shaw, Shellen Wu
+Other researchers (alphetical order by last name): Alyssa Culp, Jimmy Feng, Yiyun Huang
+
+ * To share feature suggestions, changes, and/or issues with the
+   spreadsheet used to record relevant data, feel free to contact
+   me (Jimmy Feng) at jfeng12@vols.utk.edu.
+
+
+DATA ENTRY NOTES
+================
+ * If data for a particular attribute cannot be obtained, leave that field empty; in other
+   words, do not type anything in.
+ 
+ * There are three sheets as part of the overall spreadsheet:
+	(1) Articles
+	(2) Authors
+	(3) FundingAgencies
+
+ * For every author associated with an article, enter their information in (2)
+ * For every funding agency or institution associated with an article, enter their information in (3)
+ * Please try your best not to make any duplicate entries, and if you are unsure, Ctrl+F before entering
+
+
+DATA DICTIONARY
+===============
+
+This section provides the definitions of the data attributes of interest
+and general format for which data are to be collected in the spreadsheet.
+
+The examples used to describe the attributes are based on:
+
+* Wu, Shellen. (September 2012). "Mining the Way to Wealth and Power: The Late Qing
+    Reforms of Mining Law, 1895-1911," The International History Review, Vol. 32,
+    Issue 3, 581-599.
+  - Affiliation - Department of History, University of Tennessee, Knoxville
+		(Address) University of Tennessee, Knoxville, TN 37996
+  - Bachelor's - History Literature, Harvard University, 2002
+  - Master's - History, Princeton University, 2005
+  - Doctoral - History, Princeton University, 2010
+  - Current Employment:
+	Associate Professor, Department of History, University of Tennessee,
+	Knoxville
+  - Previous Employment:
+	Most Recent: 2011-2016, Assistant Professor, Department of History,
+		     University of Tennessee, Knoxville
+	Visiting Assistant Professor, History, Bates College, 2010-2011
+  - Website: https://history.utk.edu/people/shellen-wu/
+
+
+* National Institutes of Health
+  16050 Industrial Dr #300
+  Gaithersburg, Maryland, USA, 20877
+
+
+PAPERS
+------
+
+ArticlePDFName:
+	DESCRIPTION: Full PDF name for a research article downloaded
+        	     to the shared Google Drive (or other shared storage.)
+	FORMAT: YYYYMMDDR(Article #)
+		- YYYY is the year the article was published
+		- MM is the month the article was published
+		- DD is the day the article was published
+		- R refers to (???)
+		- (Article #) refers to the the article number in an issue
+	DATA TYPE: Text/Varchar
+        EXAMPLE: 20200401R1
+
+ShortTitlePaper:
+	DESCRIPTION: Short title of a research article.
+	FORMAT: N/A (Directly retrieved as published)
+		- Text/Varchar
+        EXAMPLE: Mining the Way to Wealth and Power
+
+FullTitlePaper:
+	DESCRIPTION: Full title of a research article.
+	FORMAT: N/A (Directly retrieved as published, but the first part
+		should be the exact same as the entry for ShortTitlePaper.
+	DATA TYPE: Varchar
+        EXAMPLE: Mining the Way to Wealth and Power: The Late Qing Reforms of
+		 Mining Law, 1895-1911
+
+Discipline:
+	DESCRIPTION: Broadest branch of science that describes the nature of the
+		     research article. This is at the data collector/researcher's
+		     discretion.
+	FORMAT: Pick one of P|B|S|F
+		- P refers to Physical Science (e.g. astronomy, meteorology)
+		- B refers to Biological Science (e.g. biochemistry, medicine)
+		- S refers to Social Science (e.g. history, geography)
+		- F refers to Formal Science (e.g. logic, mathematics)
+	DATA TYPE: Character
+        EXAMPLE: S
+
+A1_Name:
+	DESCRIPTION: Full name of the first author.
+	FORMAT: Last, First Middle
+		- A comma should be included after the last name
+		- No punctuation should be included between the first and
+		  middle names unless it is part of their name (e.g. Shih-Lung)
+        EXAMPLE: Shaw, Shih-Lung | Wu, Shellen
+
+A1_Affiliate:
+	DESCRIPTION: The affiliation of the first author when the article was published.
+	FORMAT: N/A
+		- As is listed in the article
+		- No period at the end
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering, Korea Advanced Institute of Science and Technology (KAIST), Daejeon 34141, Republic of Korea
+
+A1_Gender:
+	DESCRIPTION: Gender of the first author.
+	FORMAT: [One of M | F | NB | TM | TF | O | ND]
+		- Abbreviations of the coded set in https://www.hl7.org/fhir/valueset-gender-identity.html
+		- Male                  > M
+		- Female                > F
+		- Non-Binary            > NB
+		- Transgender-Male      > TM
+		- Transgender-Female    > TF
+		- Other                 > O
+		- Non-disclose          > ND
+	DATA TYPE: Text
+	EXAMPLE: TM
+
+A2_Name:
+	DESCRIPTION: Full name of the second author.
+	FORMAT: YYYYMMDDR(Article #)
+		- YYYY is the year the article was published
+		- MM is the month the article was published
+		- DD is the day the article was published
+		- R refers to (???)
+		- (Article #) refers to the the article number in an issue
+	DATA TYPE: Text/Varchar
+        EXAMPLE: 20200401R1
+
+A2_Affiliate:
+	DESCRIPTION: The affiliation of the second author when the article was published.
+	FORMAT: N/A
+		- As is listed in the article
+		- No period at the end
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering, Korea Advanced Institute of Science and Technology (KAIST), Daejeon 34141, Republic of Korea
+
+A3_Name:
+	DESCRIPTION: Full name of the third author.
+	FORMAT: Last, First Middle
+		- A comma should be included after the last name
+		- No punctuation should be included between the first and
+		  middle names unless it is part of their name (e.g. Shih-Lung)
+	DATA TYPE: Text/Varchar
+        EXAMPLE: Shaw, Shih-Lung | Wu, Shellen
+
+A3_Affiliate:
+	DESCRIPTION: The affiliation of the third author when the article was published.
+	FORMAT: N/A
+		- As is listed in the article
+		- No period at the end
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering, Korea Advanced Institute of Science and Technology (KAIST), Daejeon 34141, Republic of Korea
+
+A4_Name:
+	DESCRIPTION: Full name of the fourth author.
+	FORMAT: Last, First Middle
+		- A comma should be included after the last name
+		- No punctuation should be included between the first and
+		  middle names unless it is part of their name (e.g. Shih-Lung)
+	DATA TYPE: Text/Varchar
+        EXAMPLE: Shaw, Shih-Lung | Wu, Shellen
+
+A4_Affiliate:
+	DESCRIPTION: The affiliation of the fourth author when the article was published.
+	FORMAT: N/A
+		- As is listed in the article
+		- No period at the end
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering, Korea Advanced Institute of Science and Technology (KAIST), Daejeon 34141, Republic of Korea
+
+A5_Name:
+	DESCRIPTION: Full name of the fifth author.
+	FORMAT: Last, First Middle
+		- A comma should be included after the last name
+		- No punctuation should be included between the first and
+		  middle names unless it is part of their name (e.g. Shih-Lung)
+	DATA TYPE: Text/Varchar
+        EXAMPLE: Shaw, Shih-Lung | Wu, Shellen
+
+A5_Affiliate:
+	DESCRIPTION: The affiliation of the fifth author when the article was published.
+	FORMAT: N/A
+		- As is listed in the article
+		- No period at the end
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering, Korea Advanced Institute of Science and Technology (KAIST), Daejeon 34141, Republic of Korea
+
+Year:
+	DESCRIPTION: Year article was publsihed.
+	FORMAT: YYYY
+		- YYYY is the year the article was published
+	DATA TYPE: Short Integer
+        EXAMPLE: 2012
+
+Volume:
+	DESCRIPTION: Volume number of the journal the article was included in.
+	FORMAT: #
+	DATA TYPE: Short Integer
+        EXAMPLE: 32
+
+Issue:
+	DESCRIPTION: Issue number of the journal the article was included in.
+	FORMAT: #
+	DATA TYPE: Short Integer
+        EXAMPLE: 3
+
+OnlinePageID:
+	DESCRIPTION: Online page ID of the article.
+	FORMAT: eaay####
+	DATA TYPE: Text/Varchar
+	EXAMPLE: eaay0688
+
+FundAgency_1:
+	DESCRIPTION: If applicable, the full name of the first listed institution/agency that
+		     funded the research.
+	FORMAT: (Name of Funding Institution/Agency)
+		- Leave empty if not applicable // Do not enter anything
+	DATA TYPE: Text/Varchar
+        EXAMPLE:
+		or: University of Tennessee, Department of History
+
+FundAgency_2:
+	DESCRIPTION: If applicable, the full name of the second listed institution/agency that
+		     funded the research.
+	FORMAT: (Name of Funding Institution/Agency)
+		- Leave empty if not applicable // Do not enter anything
+	DATA TYPE: Text/Varchar
+        EXAMPLE:
+		or: National Institutes of Health
+
+FundAgency_3:
+	DESCRIPTION: If applicable, the full name of the third listed institution/agency that
+		     funded the research.
+	FORMAT: (Name of Funding Institution/Agency)
+		- Leave empty if not applicable // Do not enter anything
+	DATA TYPE: Text/Varchar
+        EXAMPLE:
+		or: Stanford University
+
+FundAgency_4:
+	DESCRIPTION: If applicable, the full name of the fourth listed institution/agency that
+		     funded the research.
+	FORMAT: (Name of Funding Institution/Agency)
+		- Leave empty if not applicable // Do not enter anything
+	DATA TYPE: Text/Varchar
+        EXAMPLE:
+		or: National Science Centre
+
+
+AUTHORS
+-------
+
+Articles:
+	DESCRIPTION: Full PDF name for one or more research articles downloaded
+        	     to the shared Google Drive (or other shared storage) associated with
+		     an particular author.
+	FORMAT: YYYYMMDDR(Article #)
+		- YYYY is the year the article was published
+		- MM is the month the article was published
+		- DD is the day the article was published
+		- R refers to (???)
+		- (Article #) refers to the the article number in an issue
+		- If there are multiple articles associated with an particular author, separate
+		  with a semi-colon (;) to separate articles.
+			* If it is unsure whether an existing author in the spreadsheet/list
+			  should be associated with an article, enter a new row for the particular
+			  article. 
+	DATA TYPE: Text/Varchar
+        EXAMPLE: 20200401R1	
+
+CV_PDFName:
+	DESCRIPTION: Full PDF name for an author's resume or curriculum vitae downloaded
+        	     to the shared Google Drive (or other shared storage.)
+	FORMAT: LastName_FirstNameMiddleName(_[LetterInAlphabet])
+		- LastName refers to the last name of an author.
+		- FirstName refers to the first name of an author.
+		- MiddleName refers to the middle name of an author; if only an initial is provided,
+		  include it.
+		- (*_[LetterInAlphabet]) is optional; if there are multiple authors with the same
+		  last and first names, add an underscore followed by a letter in the conventional
+		  ordering of the alphabet.
+	DATA TYPE: Text/Varchar
+        EXAMPLE: Wu_S_A, Wu_S_B
+
+CV_URL:
+	DESCRIPTION: URL to an author's profile, resume, and/or curriculum vitae.
+	FORMAT: (...).[com|io|gov|etcetera]/(...)
+		- Full URL path for an author's profile, resume, and/or curriculum vitae.
+		- If there are multiple CVs available online, include them and separate with a semi-colon (;)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: https://history.utk.edu/people/shellen-wu/
+
+AuthorName:
+	DESCRIPTION: Full name of the author.
+	FORMAT: Last, First Middle
+		- A comma should be included after the last name
+		- No punctuation should be included between the first and
+		  middle names unless it is part of their name (e.g. Shih-Lung)
+        EXAMPLE: Shaw, Shih-Lung | Wu, Shellen
+
+OnlinePageIDs:
+	DESCRIPTION: All online page IDs of articles an author has been credited for.
+	FORMAT: eaay####
+		- Separate IDs with a semi-colon (;)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: eaay0688, geog1234, hist5890
+
+CurrentPosition:
+	DESCRIPTION: Current position of the author.
+	FORMAT: N/A
+		- Current job/position of the author
+		- If there are multiple, separate with semicolons (;)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Associate Professor
+
+CurrentDepartment:
+	DESCRIPTION: Current department to which the author belongs to.
+		     Leave blank if an author does not belong to a department.
+	FORMAT: N/A
+		- Current department(s) of the author
+		- If there are multiple, separate with semicolons (;)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Department of Materials Science and Engineering; 
+
+UGName:
+	DESCRIPTION: Undergraduate institution of the author.
+	FORMAT: Full Institution Name
+	DATA TYPE: Text
+	EXAMPLE: Harvard University
+
+UGCity:
+	DESCRIPTION: City of author's undergraduate institution.
+	FORMAT: City
+	DATA TYPE: Text
+	EXAMPLE: Cambridge
+
+UGStateProvince:
+	DESCRIPTION: State or province of author's undergraduate institution.
+	FORMAT: State/Province
+	DATA TYPE: Text
+	EXAMPLE: Massachusetts
+
+UGCountryTerritory:
+	DESCRIPTION: Country or territory of author's undergraduate institution.
+	FORMAT: ISO3 Country Code
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text
+	EXAMPLE: USA
+
+UGDiscipline:
+	DESCRIPTION: Author's undergraduate major.
+	FORMAT: (N/A)
+	DATA TYPE: Text
+        EXAMPLE: History Literature
+
+UGDegreeYear:
+	DESCRIPTION: Year in which undergraduate degree was received by author.
+	FORMAT: YYYY
+	DATA TYPE: Short Integer
+        EXAMPLE: 2002
+
+MasterName:
+	DESCRIPTION: Author's Master's institution.
+	FORMAT: Full Institution Name
+	DATA TYPE: Text
+	EXAMPLE: Princeton University
+
+MasterCity:
+	DESCRIPTION: City of author's Master's institution.
+	FORMAT: City
+	DATA TYPE: Text
+	EXAMPLE: Princeton
+
+MasterStateProvince:
+	DESCRIPTION: State or province of author's Master's institution.
+	FORMAT: State/Province
+	DATA TYPE: Text
+	EXAMPLE: New Jersey
+
+MasterCountryTerritory:
+	DESCRIPTION: Country or territory of author's Master's institution.
+	FORMAT: ISO3 Country Code
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text
+	EXAMPLE: USA
+
+MasterDiscipline:
+	DESCRIPTION: Author's Master's discipline.
+	FORMAT: (N/A)
+	DATA TYPE: Text
+        EXAMPLE: History
+
+MasterDegreeYear:
+	DESCRIPTION: Year in which Master's degree was received by author.
+	FORMAT: YYYY
+	DATA TYPE: Short Integer
+        EXAMPLE: 2005
+
+DoctorName:
+	DESCRIPTION: Author's doctoral institution.
+	FORMAT: Full Institution Name
+	DATA TYPE: Text
+	EXAMPLE: Princeton University
+
+DoctorCity:
+	DESCRIPTION: City of author's doctoral institution.
+	FORMAT: City
+	DATA TYPE: Text
+	EXAMPLE: Princeton
+
+DoctorStateProvince:
+	DESCRIPTION: State or province of author's doctoral institution.
+	FORMAT: State/Province
+	DATA TYPE: Text
+	EXAMPLE: New Jersey
+
+DoctorCountryTerritory:
+	DESCRIPTION: Country or territory of author's doctoral institution.
+	FORMAT: ISO3 Country Code
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text
+	EXAMPLE: USA
+
+DoctorDiscipline:
+	DESCRIPTION: Author's doctoral discipline.
+	FORMAT: (N/A)
+	DATA TYPE: Text
+        EXAMPLE: History
+
+DoctorDegreeYear:
+	DESCRIPTION: Year in which doctoral degree was received by author.
+	FORMAT: YYYY
+	DATA TYPE: Short Integer
+        EXAMPLE: 2010
+
+DoctorName2:
+	DESCRIPTION: Author's second doctoral institution, if applicable.
+	FORMAT: Full Institution Name
+	DATA TYPE: Text
+	EXAMPLE: Princeton University
+
+DoctorCity2:
+	DESCRIPTION: City of author's second doctoral institution.
+	FORMAT: City
+	DATA TYPE: Text
+	EXAMPLE: Princeton
+
+DoctorStateProvince2:
+	DESCRIPTION: State or province of author's second doctoral institution.
+	FORMAT: State/Province
+	DATA TYPE: Text
+	EXAMPLE: New Jersey
+
+DoctorCountryTerritory2:
+	DESCRIPTION: Country or territory of author's second doctoral institution.
+	FORMAT: ISO3 Country Code
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text
+	EXAMPLE: USA
+
+DoctorDiscipline2:
+	DESCRIPTION: Author's second doctoral discipline.
+	FORMAT: (N/A)
+	DATA TYPE: Text
+        EXAMPLE: History
+
+DoctorDegreeYear2:
+	DESCRIPTION: Year in which second doctoral degree was received by author.
+	FORMAT: YYYY
+	DATA TYPE: Short Integer
+        EXAMPLE: 2010
+
+RecentEmployer:
+	DESCRIPTION: Name of author's most recent employer/institution/company name.
+		     In the case that there may be locations in different areas, if possible, identify
+		     the most relevant location. Otherwise, list the employer's headquarters.
+	FORMAT: (N/A)
+		- Refer to https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(companies)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Google | Oracle Corporation
+		 * Note the omittance of LLC for Google but the inclusion of Corporation for Oracle
+		 * As further detailed in the above website, only include integral information
+
+RE_Street:
+	DESCRIPTION: The full street address of the most recent employer
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+RE_City:
+	DESCRIPTION: The full name of the city of the most recent employer
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+RE_StateProvince:
+	DESCRIPTION: The full name of the state or province of the most recent employer
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+RE_ZipCode:
+	DESCRIPTION: The zip code of the most recent employer
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+RE_CountryTerritory
+	DESCRIPTION: The ISO-3 code of the country/territory where the most recent employer is located.
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+RE_StartYear
+	DESCRIPTION: The starting year the author was employed by the most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RE_EndYear
+	DESCRIPTION: The starting year the author was employed by the most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+		- Enter 9999 if it is the author's current employment
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RecentEmployer2:
+	DESCRIPTION: Name of author's second most recent employer/institution/company name.
+		     In the case that there may be locations in different areas, if possible, identify
+		     the most relevant location. Otherwise, list the employer's headquarters.
+	FORMAT: (N/A)
+		- Refer to https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(companies)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Google | Oracle Corporation
+		 * Note the omittance of LLC for Google but the inclusion of Corporation for Oracle
+		 * As further detailed in the above website, only include integral information
+
+RE2_Street:
+	DESCRIPTION: The full street address of the second most recent employer
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+RE2_City:
+	DESCRIPTION: The full name of the city of the second most recent employer
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+RE2_StateProvince:
+	DESCRIPTION: The full name of the state or province of the second most recent employer
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+RE2_ZipCode:
+	DESCRIPTION: The zip code of the second most recent employer
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+RE2_CountryTerritory
+	DESCRIPTION: The ISO-3 code of the country/territory where the second most recent employer is located.
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+RE2_StartYear
+	DESCRIPTION: The starting year the author was employed by the second most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RE2_EndYear
+	DESCRIPTION: The starting year the author was employed by the second most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+		- Enter 9999 if it is the author's current employment
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RecentEmployer3:
+	DESCRIPTION: Name of author's third most recent employer/institution/company name.
+		     In the case that there may be locations in different areas, if possible, identify
+		     the most relevant location. Otherwise, list the employer's headquarters.
+	FORMAT: (N/A)
+		- Refer to https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(companies)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Google | Oracle Corporation
+		 * Note the omittance of LLC for Google but the inclusion of Corporation for Oracle
+		 * As further detailed in the above website, only include integral information
+
+RE3_Street:
+	DESCRIPTION: The full street address of the third most recent employer
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+RE3_City:
+	DESCRIPTION: The full name of the city of the third most recent employer
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+RE3_StateProvince:
+	DESCRIPTION: The full name of the state or province of the third most recent employer
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+RE3_ZipCode:
+	DESCRIPTION: The zip code of the third most recent employer
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+RE3_CountryTerritory
+	DESCRIPTION: The ISO-3 code of the country/territory where the third most recent employer is located.
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+RE3_StartYear
+	DESCRIPTION: The starting year the author was employed by the third most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RE3_EndYear
+	DESCRIPTION: The starting year the author was employed by the third most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+		- Enter 9999 if it is the author's current employment
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RecentEmployer4:
+	DESCRIPTION: Name of author's second most recent employer/institution/company name.
+		     In the case that there may be locations in different areas, if possible, identify
+		     the most relevant location. Otherwise, list the employer's headquarters.
+	FORMAT: (N/A)
+		- Refer to https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(companies)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Google | Oracle Corporation
+		 * Note the omittance of LLC for Google but the inclusion of Corporation for Oracle
+		 * As further detailed in the above website, only include integral information
+
+RE4_Street:
+	DESCRIPTION: The full street address of the fourth most recent employer
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+RE4_City:
+	DESCRIPTION: The full name of the city of the fourth most recent employer
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+RE4_StateProvince:
+	DESCRIPTION: The full name of the state or province of the fourth most recent employer
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+RE4_ZipCode:
+	DESCRIPTION: The zip code of the fourth most recent employer
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+RE4_CountryTerritory
+	DESCRIPTION: The ISO-3 code of the country/territory where the fourth most recent employer is located.
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+RE4_StartYear
+	DESCRIPTION: The starting year the author was employed by the fourth most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RE4_EndYear
+	DESCRIPTION: The starting year the author was employed by the fourth most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+		- Enter 9999 if it is the author's current employment
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RecentEmployer5:
+	DESCRIPTION: Name of author's fifth most recent employer/institution/company name.
+		     In the case that there may be locations in different areas, if possible, identify
+		     the most relevant location. Otherwise, list the employer's headquarters.
+	FORMAT: (N/A)
+		- Refer to https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(companies)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Google | Oracle Corporation
+		 * Note the omittance of LLC for Google but the inclusion of Corporation for Oracle
+		 * As further detailed in the above website, only include integral information
+
+RE5_Street:
+	DESCRIPTION: The full street address of the fifth most recent employer
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+RE5_City:
+	DESCRIPTION: The full name of the city of the fifth most recent employer
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+RE5_StateProvince:
+	DESCRIPTION: The full name of the state or province of the fifth most recent employer
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+RE5_ZipCode:
+	DESCRIPTION: The zip code of the fifth most recent employer
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+RE5_CountryTerritory
+	DESCRIPTION: The ISO-3 code of the country/territory where the fifth most recent employer is located.
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+RE5_StartYear
+	DESCRIPTION: The starting year the author was employed by the fifth most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+RE5_EndYear
+	DESCRIPTION: The starting year the author was employed by the fifth most recent employer
+	FORMAT: YYYY
+		- Leave blank if no data
+		- Enter 9999 if it is the author's current employment
+	DATA TYPE: Short Integer
+	EXAMPLE: 2019
+
+
+FundingAgencies
+---------------
+
+ * At a minimum, include the City, State/Province, and Country
+
+FundingAgency:
+	DESCRIPTION: Full name of funding institution/agency
+	FORMAT: (Name of Funding Institution/Agency)
+	DATA TYPE: Text/Varchar
+        EXAMPLE: University of Tennessee, Department of History | National Institutes of Health
+
+FA_Street:
+	DESCRIPTION: The full street address of the funding agency
+	FORMAT: (Street address)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 16050 Industrial Dr #300
+
+FA_City:
+	DESCRIPTION: The full name of the city of the funding agency
+	FORMAT: (City)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Gaithersburg
+
+FA_StateProvince:
+	DESCRIPTION: The full name of the state or province of the funding agency
+	FORMAT: (State/Province)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: Maryland
+
+FA_ZipCode:
+	DESCRIPTION: The zip code of the funding agency
+	FORMAT: (Zip Code)
+	DATA TYPE: Text/Varchar
+	EXAMPLE: 20877
+
+FA_Country:
+	DESCRIPTION: The ISO-3 code of the country of the funding agency
+	FORMAT: (ISO-3 Code of Country)
+		- Refer to http://www.fao.org/countryprofiles/iso3list/en/ for official ISO3 country codes
+	DATA TYPE: Text/Varchar
+	EXAMPLE: USA
+
+FA_Sector:
+	DESCRIPTION: The public/private distinction of a funding agency.
+	FORMAT: (One of PRI | PUB)
+	DATA TYPE: Text
+	EXAMPLE: PRI
+
+FA_OldName:
+	DESCRIPTION: Full old name(s) of funding institution/agency
+	FORMAT: (Old Name of Funding Institution/Agency)
+		- Leave blank if no data
+		- If there are multiple old names, create additional columns as necessary. These new columns
+		  should be renamed with a number (e.g. FA_OldName2, FA_OldName3...)
+	DATA TYPE: Text/Varchar
+        EXAMPLE: University of Tennessee, Department of History | National Institutes of Health
