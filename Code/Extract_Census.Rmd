@@ -1,0 +1,381 @@
+---
+title: "Census Data Extraction"
+output: html_notebook
+---
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+#install.package("INSERT PACKAGE NAME")
+library(tidyverse)
+library(tidycensus)
+library(leaflet)
+library(stringr)
+library(sf)
+library(dplyr)
+census_api_key("32a40cd34fcb3e496b4187c577ede109d159496d")
+```
+
+```{r Data frame for Census variables}
+acs5.2020 <- load_variables(2020, "acs5", cache=TRUE)
+# Esri ACS Variables Data Catalog: https://downloads.esri.com/esri_content_doc/dbl/us/Var_List_ACS_Summer2021.pdf
+
+
+# B05002: Place of Birth by Nativity and Citizenship Status
+# B08301: Means of Transportation to work
+# B08302: Time leaving home to go to work
+# B08303: Travel Time to work
+# B17026: Ratio of Income to Poverty Level of Families in the Past 12 Months
+# B19057: Aggregate Earnings in the Past 12 Months (2015) for Households
+# B16002: Household Language by Household Limited English Speaking Status
+# B16004: Age by Language Spoken at Home by Ability to Speak English for the Population 5 Years and Older
+# B25063: Gross Rent
+# B25064: Median Gross Rent
+# B25070: Gross Rent as a percentage of household income in the past 12 months
+# B25071: Median gross rent as a percentage of household income in the past 12 months
+# B27001: Health insurance coverage status by sex by age
+# B27011: Health insurance coverage status and type by employment status by age
+
+# CCVI Variables
+
+knox_county_bg <- get_acs(state = "TN", 
+                        county = c("Knox"),
+                        year = 2020,
+                        geography = "block group",
+                        geometry = TRUE,
+                        variables = c(# Total Population
+                                      TotalPop = "B01001_001", # Total Population, Block Group
+                                      # Total Households
+                                      
+                                      # Socioeconomic Status
+                                      # Poverty (C17002002E + C17002003E)/TotalPopE
+                                      C17002002 = "C17002_002", # C17002_002 Block Group
+                                      C17002003 = "C17002_003", # C17002_003 Block Group
+                                      #PovertyU50 = "C18131_002", # C18131_002 Census Tract
+                                      #PovertyTo1 = "C18131_005", # C18131_005 Census Tract
+                                      
+                                      # Unemployment Unemployed <- B23025_005E/TotalPopE
+                                      B23025005 = "B23025_005", # Estimate!!Total:!!In labor force:!!Civilian labor force:!!Unemployed, Block Group
+                                      # B23001008 = "B23001_008", # Estimate!!Total:!!Male:!!16 to 19 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001015 = "B23001_015", # Estimate!!Total:!!Male:!!20 and 21 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001022 = "B23001_022", # Estimate!!Total:!!Male:!!22 to 24 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001029 = "B23001_029", # Estimate!!Total:!!Male:!!25 to 29 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001036 = "B23001_036", # Estimate!!Total:!!Male:!!30 to 34 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001043 = "B23001_043", # Estimate!!Total:!!Male:!!35 to 44 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001050 = "B23001_050", # Estimate!!Total:!!Male:!!45 to 54 years:!!In labor force:!!Civilian:!!Unemployed	, Census Tract
+                                      # B23001057 = "B23001_057", # Estimate!!Total:!!Male:!!55 to 59 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001064 = "B23001_064", # Estimate!!Total:!!Male:!!60 and 61 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001071 = "B23001_071", # Estimate!!Total:!!Male:!!62 to 64 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001076 = "B23001_078", # Estimate!!Total:!!Male:!!65 to 69 years:!!In labor force:!!Unemployed, Census Tract
+                                      # B23001081 = "B23001_081", # Estimate!!Total:!!Male:!!70 to 74 years:!!In labor force:!!Unemployed, Census Tract
+                                      # B23001086 = "B23001_086", # Estimate!!Total:!!Male:!!75 years and over:!!In labor force:!!Unemployed, Census Tract
+                                      # B23001094 = "B23001_008", # Estimate!!Total:!!Female:!!16 to 19 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001101 = "B23001_015", # Estimate!!Total:!!Female:!!20 and 21 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001108 = "B23001_022", # Estimate!!Total:!!Female:!!22 to 24 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001115 = "B23001_029", # Estimate!!Total:!!Female:!!25 to 29 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001122 = "B23001_036", # Estimate!!Total:!!Female:!!30 to 34 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001129 = "B23001_043", # Estimate!!Total:!!Female:!!35 to 44 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001136 = "B23001_050", # Estimate!!Total:!!Female:!!45 to 54 years:!!In labor force:!!Civilian:!!Unemployed	, Census Tract
+                                      # B23001143 = "B23001_057", # Estimate!!Total:!!Female:!!55 to 59 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001150 = "B23001_064", # Estimate!!Total:!!Female:!!60 and 61 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001157 = "B23001_071", # Estimate!!Total:!!Female:!!62 to 64 years:!!In labor force:!!Civilian:!!Unemployed, Census Tract
+                                      # B23001162 = "B23001_078", # Estimate!!Total:!!Female:!!65 to 69 years:!!In labor force:!!Unemployed, Census Tract
+                                      # B23001167 = "B23001_081", # Estimate!!Total:!!Female:!!70 to 74 years:!!In labor force:!!Unemployed, Census Tract
+                                      # B23001172 = "B23001_086", # Estimate!!Total:!!Female:!!75 years and over:!!In labor force:!!Unemployed, Census Tract	                                      
+                                      # Median Income
+                                      Income_Med = "B19013_001", # MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS), Block Group
+                                      # Income_Med = "B19019_001", # MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS) BY ALL HOUSEHOLD SIZES, Census Tract
+                                      # No High School Diploma
+                                      # NoHSDiplom <- (knox_county_tract$B15003001 ... knox_county_tract$B15003016) / (knox_county_tract$B01001011 ... knox_county_tract$B01001049)
+                                      B15003001 = "B15003_001", # Estimate!!Total:,
+                                      B15003002 = "B15003_002", # Estimate!!Total:!!No schooling completed, Block Group
+                                      B15003003 = "B15003_003", # Estimate!!Total:!!Nursery school, Block Group
+                                      B15003004 = "B15003_004", # Estimate!!Total:!!Kindergarten, Block Group
+                                      B15003005 = "B15003_005", # Estimate!!Total:!!1st grade, Block Group
+                                      B15003006 = "B15003_006", # Estimate!!Total:!!2nd grade, Block Group
+                                      B15003007 = "B15003_007", # Estimate!!Total:!!3rd grade, Block Group
+                                      B15003008 = "B15003_008", # Estimate!!Total:!!4th grade, Block Group
+                                      B15003009 = "B15003_009", # Estimate!!Total:!!5th grade, Block Group
+                                      B15003010 = "B15003_010", # Estimate!!Total:!!6th grade, Block Group
+                                      B15003011 = "B15003_011", # Estimate!!Total:!!7th grade, Block Group
+                                      B15003012 = "B15003_012", # Estimate!!Total:!!8th grade, Block Group
+                                      B15003013 = "B15003_013", # Estimate!!Total:!!9th grade, Block Group
+                                      B15003014 = "B15003_014", # Estimate!!Total:!!10th grade, Block Group
+                                      B15003015 = "B15003_015", # Estimate!!Total:!!11th grade, Block Group
+                                      B15003016 = "B15003_016", # Estimate!!Total:!!12th grade, no diploma, Block Group
+                                      # Total Population 25 and Older
+                                      B01001011 = "B01001_011", # Estimate!!Total:!!Male:!!25 to 29 years, Block Group
+                                      B01001012 = "B01001_012", # Estimate!!Total:!!Male:!!30 to 34 years, Block Group
+                                      B01001013 = "B01001_013", # Estimate!!Total:!!Male:!!35 to 39 years, Block Group
+                                      B01001014 = "B01001_014", # Estimate!!Total:!!Male:!!40 to 44 years, Block Group
+                                      B01001015 = "B01001_015", # Estimate!!Total:!!Male:!!45 to 49 years, Block Group
+                                      B01001016 = "B01001_016", # Estimate!!Total:!!Male:!!50 to 54 years, Block Group
+                                      B01001017 = "B01001_017", # Estimate!!Total:!!Male:!!55 to 59 years, Block Group
+                                      B01001018 = "B01001_018", # Estimate!!Total:!!Male:!!60 and 61 years, Block Group
+                                      B01001019 = "B01001_019", # Estimate!!Total:!!Male:!!62 to 64 years, Block Group
+                                      B01001020 = "B01001_020", # Estimate!!Total:!!Male:!!65 and 66 years, Block Group
+                                      B01001021 = "B01001_021", # Estimate!!Total:!!Male:!!67 to 69 years, Block Group
+                                      B01001022 = "B01001_022", # Estimate!!Total:!!Male:!!70 to 74 years, Block Group
+                                      B01001023 = "B01001_023", # Estimate!!Total:!!Male:!!75 to 79 years, Block Group
+                                      B01001024 = "B01001_024", # Estimate!!Total:!!Male:!!80 to 84 years, Block Group
+                                      B01001025 = "B01001_025", # Estimate!!Total:!!Male:!!85 years and over, Block Group
+                                      B01001035 = "B01001_035", # Estimate!!Total:!!Female:!!25 to 29 years, Block Group
+                                      B01001036 = "B01001_036", # Estimate!!Total:!!Female:!!30 to 34 years, Block Group
+                                      B01001037 = "B01001_037", # Estimate!!Total:!!Female:!!35 to 39 years, Block Group
+                                      B01001038 = "B01001_038", # Estimate!!Total:!!Female:!!40 to 44 years, Block Group
+                                      B01001039 = "B01001_039", # Estimate!!Total:!!Female:!!45 to 49 years, Block Group
+                                      B01001040 = "B01001_040", # Estimate!!Total:!!Female:!!50 to 54 years, Block Group
+                                      B01001041 = "B01001_041", # Estimate!!Total:!!Female:!!55 to 59 years, Block Group
+                                      B01001042 = "B01001_042", # Estimate!!Total:!!Female:!!60 and 61 years, Block Group
+                                      B01001043 = "B01001_043", # Estimate!!Total:!!Female:!!62 to 64 years, Block Group
+                                      B01001044 = "B01001_044", # Estimate!!Total:!!Female:!!65 and 66 years, Block Group
+                                      B01001045 = "B01001_045", # Estimate!!Total:!!Female:!!67 to 69 years, Block Group
+                                      B01001046 = "B01001_046", # Estimate!!Total:!!Female:!!70 to 74 years, Block Group
+                                      B01001047 = "B01001_047", # Estimate!!Total:!!Female:!!75 to 79 years, Block Group
+                                      B01001048 = "B01001_048", # Estimate!!Total:!!Female:!!80 to 84 years, Block Group
+                                      B01001049 = "B01001_049", # Estimate!!Total:!!Female:!!85 years and over, Block Group                                        
+                                      # No_HS_Dipl = "B16010_002", #, Estimate!!Total:!!Less than high school graduate, Census Tract
+                                      #
+                                      #
+                                      # Household Composition & Disability
+                                      #
+                                      # Age 65 and Older
+                                      B01001020 = "B01001_020", # Estimate!!Total:!!Male:!!65 and 66 years, Block Group
+                                      B01001021 = "B01001_021", # Estimate!!Total:!!Male:!!67 to 69 years, Block Group
+                                      B01001022 = "B01001_022", # Estimate!!Total:!!Male:!!70 to 74 years, Block Group
+                                      B01001023 = "B01001_023", # Estimate!!Total:!!Male:!!75 to 79 years, Block Group
+                                      B01001024 = "B01001_024", # Estimate!!Total:!!Male:!!80 to 84 years, Block Group
+                                      B01001025 = "B01001_025", # Estimate!!Total:!!Male:!!85 years and over, Block Group
+                                      B01001044= "B01001_044", # Estimate!!Total:!!Female:!!65 and 66 years, Block Group
+                                      B01001045= "B01001_045", # Estimate!!Total:!!Female:!!67 to 69 years, Block Group
+                                      B01001046 = "B01001_046", # Estimate!!Total:!!Female:!!70 to 74 years, Block Group
+                                      B01001047 = "B01001_047", # Estimate!!Total:!!Female:!!75 to 79 years, Block Group
+                                      B01001048 = "B01001_048", # Estimate!!Total:!!Female:!!80 to 84 years, Block Group
+                                      B01001049 = "B01001_049", # Estimate!!Total:!!Female:!!85 years and over, Block Group
+                                      #
+                                      # Aged 17 or Younger
+                                      B01001003 = "B01001_003", # Estimate!!Total:!!Male:!!Under 5 years, Block Group  
+                                      B01001004 = "B01001_004", # Estimate!!Total:!!Male:!!5 to 9 years, Block Group  
+                                      B01001005 = "B01001_005", # Estimate!!Total:!!Male:!!10 to 14 years, Block Group  
+                                      B01001006 = "B01001_006", # Estimate!!Total:!!Male:!!15 to 17 years, Block Group  
+                                      B01001027 = "B01001_027", # Estimate!!Total:!!Female:!!Under 5 years, Block Group  
+                                      B01001028 = "B01001_028", # Estimate!!Total:!!Female:!!5 to 9 years, Block Group  
+                                      B01001029 = "B01001_029", # Estimate!!Total:!!Female:!!10 to 14 years, Block Group  
+                                      B01001030 = "B01001_030", # Estimate!!Total:!!Female:!!15 to 17 years, Block Group
+                                      #
+                                      # Households with 1 or more persons with a Disability
+                                      B22010001 = "B22010_001", # Total Households
+                                      B22010003 = "B22010_003", # Estimate!!Total:!!Household received Food Stamps/SNAP in the past 12 months:!!Households with 1 or more persons with a disability, Block Group
+                                      B22010006 = "B22010_006", # Estimate!!Total:!!Household did not receive Food Stamps/SNAP in the past 12 months:!!Households with 1 or more persons with a disability, Block Group
+                                      # Civilian with a Disability
+                                      # DisM_5 = "B18101_004", # Estimate!!Total:!!Male:!!Under 5 years:!!With a disability, Census Tract
+                                      # DisM_5_17 = "B18101_007", # Estimate!!Total:!!Male:!!5 to 17 years:!!With a disability, Census Tract
+                                      # DisM_18_34 = "B18101_010", # Estimate!!Total:!!Male:!!18 to 34 years:!!With a disability, Census Tract
+                                      # DisM_35_64 = "B18101_013", # Estimate!!Total:!!Male:!!35 to 64 years:!!With a disability, Census Tract
+                                      # DisM_65_74 = "B18101_016", # Estimate!!Total:!!Male:!!65 to 74 years:!!With a disability, Census Tract
+                                      # DisM_75_Ov = "B18101_019", # 	Estimate!!Total:!!Male:!!75 years and over:!!With a disability, Census Tract
+                                      # DisF_5 = "B18101_023", # Estimate!!Total:!!Female:!!Under 5 years:!!With a disability, Census Tract
+                                      # DisF_5_17 = "B18101_026", # Estimate!!Total:!!Female:!!5 to 17 years:!!With a disability, Census Tract
+                                      # DisF_18_34 = "B18101_029", # Estimate!!Total:!!Female:!!18 to 34 years:!!With a disability, Census Tract
+                                      # DisF_35_64 = "B18101_032", # Estimate!!Total:!!Female:!!35 to 64 years:!!With a disability, Census Tract
+                                      # DisF_65_74 = "B18101_035", # Estimate!!Total:!!Female:!!65 to 74 years:!!With a disability, Census Tract
+                                      # DisF_75_Ov = "B18101_038", # 	Estimate!!Total:!!Female:!!75 years and over:!!With a disability, Census Tract
+                                      # Single-Parent Households
+                                      B11003001 = "B11003_001", # Estimate!!Total:Family, Block Group
+                                      B11003010 = "B11003_010", # Estimate!!Total:!!Other family:!!Male householder, no spouse present:!!With own children of the householder under 18 years, Block Group
+                                      B11003016 = "B11003_016", # Estimate!!Total:!!Other family:!!Female householder, no spouse present:!!With own children of the householder under 18 years, Block Group
+                                      #
+                                      # Minority Status & Language
+                                      #
+                                      # Minority (1 - (White/TotalPop))
+                                      AmerIndian = "B03002_005", # American Indian and Alaskan Native Population, Block Group
+                                      Asian = "B03002_006", # Asian Population, Block Group
+                                      Hispanic = "B03002_012", # Hispanic Population, Block Group
+                                      NaHaPaIs = "B03002_007", # Native Hawaiian and Pacific Islander Population, Block Group
+                                      OtherRace1 = "B03002_008", # Some Other Race Alone Population, Block Group
+                                      OtherRace2 = "B03002_009", # Two or More Races Population, Block Group
+                                      White = "B03002_003", # White Population, Block Group
+                                      Black = "B03002_004", # Black Population, Block Group
+                                      # Black = "B01001B_001", # Black Population, Census Tract
+                                      # AmerInd = "B01001C_001", # American Indian and Alaskan Native Population, Census Tract
+                                      # Asian = "B01001D_001", # Asian Population, Census Tract
+                                      # NaHaPaIs = "B01001E_001", # Native Hawaiian and Pacific Islander Population, Census Tract
+                                      # OtherRace1 = "B01001F_001", # Some Other Race Alone Population, Census Tract
+                                      # OtherRace2 = "B01001G_001", # Two or More Races Population, Census Tract
+                                      # White = "B01001H_001", # White Population, Census Tract
+                                      # Hispanic = "B01001I_001", # Hispanic Population, Census Tract
+                                      #                                     
+                                      # Speaks English "Less than Well"
+                                      B16004007 = "B16004_007", # Estimate!!Total:!!5 to 17 years:!!Speak Spanish:!!Speak English "not well", Block Group
+                                      B16004008 = "B16004_008", # Estimate!!Total:!!5 to 17 years:!!Speak Spanish:!!Speak English "not at all", Block Group
+                                      B16004012 = "B16004_012", # Estimate!!Total:!!5 to 17 years:!!Speak other Indo-European languages:!!Speak English "not well", Block Group
+                                      B16004013 = "B16004_013", # Estimate!!Total:!!5 to 17 years:!!Speak other Indo-European languages:!!Speak English "not at all", Block Group
+                                      B16004017 = "B16004_017", # Estimate!!Total:!!5 to 17 years:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Block Group
+                                      B16004018 = "B16004_018", # Estimate!!Total:!!5 to 17 years:!!Speak Asian and Pacific Island languages:!!Speak English "not at all", Block Group
+                                      B16004022 = "B16004_022", # Estimate!!Total:!!5 to 17 years:!!Speak other languages:!!Speak English "not well", Block Group
+                                      B16004023 = "B16004_023", # Estimate!!Total:!!5 to 17 years:!!Speak other languages:!!Speak English "not at all", Block Group
+                                      B16004029 = "B16004_029", # Estimate!!Total:!!18 to 64 years:!!Speak Spanish:!!Speak English "not well", Block Group	
+                                      B16004030 = "B16004_030", # Estimate!!Total:!!18 to 64 years:!!Speak Spanish:!!Speak English "not at all", Block Group
+                                      B16004034 = "B16004_034", # Estimate!!Total:!!18 to 64 years:!!Speak other Indo-European languages:!!Speak English "not well", Block Group
+                                      B16004035 = "B16004_035", # Estimate!!Total:!!18 to 64 years:!!Speak other Indo-European languages:!!Speak English "not at all", Block Group
+                                      B16004039 = "B16004_039", # Estimate!!Total:!!18 to 64 years:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Block Group
+                                      B16004040 = "B16004_040", # Estimate!!Total:!!18 to 64 years:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Block Group
+                                      B16004044 = "B16004_044", # Estimate!!Total:!!18 to 64 years:!!Speak other languages:!!Speak English "not well", Block Group
+                                      B16004045 = "B16004_045", # Estimate!!Total:!!18 to 64 years:!!Speak other languages:!!Speak English "not at all", Block Group
+                                      B16004051 = "B16004_051", # Estimate!!Total:!!65 years and over:!!Speak Spanish:!!Speak English "not well", Block Group	
+                                      B16004052 = "B16004_052", # Estimate!!Total:!!65 years and over:!!Speak Spanish:!!Speak English "not at all", Block Group
+                                      B16004056 = "B16004_056", # Estimate!!Total:!!65 years and over:!!Speak other Indo-European languages:!!Speak English "not well", Block Group
+                                      B16004057 = "B16004_057", # Estimate!!Total:!!65 years and over:!!Speak other Indo-European languages:!!Speak English "not at all", Block Group
+                                      B16004061 = "B16004_061", # Estimate!!Total:!!65 years and over:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Block Group
+                                      B16004062 = "B16004_062", # Estimate!!Total:!!65 years and over:!!Speak Asian and Pacific Island languages:!!Speak English "not at all", Block Group
+                                      B16004066 = "B16004_066", # Estimate!!Total:!!65 years and over:!!Speak other languages:!!Speak English "not well", Block Group
+                                      B16004067 = "B16004_067", # Estimate!!Total:!!65 years and over:!!Speak other languages:!!Speak English "not at all", Block Group
+                                      # B16044007 = "B16005_007", # Estimate!!Total:!!Native:!!Speak Spanish:!!Speak English "not well", Census Tract
+                                      # B16044008 = "B16005_008", # Estimate!!Total:!!Native:!!Speak Spanish:!!Speak English "not at all", Census Tract
+                                      # B16044012 = "B16005_012", # Estimate!!Total:!!Native:!!Speak other Indo-European languages:!!Speak English "not well", Census Tract
+                                      # B16044013 = "B16005_013", # Estimate!!Total:!!Native:!!Speak other Indo-European languages:!!Speak English "not at all", Census Tract
+                                      # B16044017 = "B16005_017", # Estimate!!Total:!!Native:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Census Tract
+                                      # B16044018 = "B16005_018", # Estimate!!Total:!!Native:!!Speak Asian and Pacific Island languages:!!Speak English "not at all", Census Tract
+                                      # B16044022 = "B16005_022", # Estimate!!Total:!!Native:!!Speak other languages:!!Speak English "not well", Census Tract
+                                      # B16044023 = "B16005_023", # Estimate!!Total:!!Native:!!Speak other languages:!!Speak English "not at all", Census Tract
+                                      # B16044029 = "B16005_029", # Estimate!!Total:!!Foreign born:!!Speak Spanish:!!Speak English "not well", Census Tract
+                                      # B16044030 = "B16005_030", # Estimate!!Total:!!Foreign born:!!Speak Spanish:!!Speak English "not at all", Census Tract
+                                      # B16044034 = "B16005_034", # Estimate!!Total:!!Foreign born:!!Speak other Indo-European languages:!!Speak English "not well", Census Tract
+                                      # B16044035 = "B16005_035", # Estimate!!Total:!!Foreign born:!!Speak other Indo-European languages:!!Speak English "not at all", Census Tract
+                                      # B16044039 = "B16005_039", # Estimate!!Total:!!Foreign born:!!Speak Asian and Pacific Island languages:!!Speak English "not well", Census Tract
+                                      # B16044040 = "B16005_040", # Estimate!!Total:!!Foreign born:!!Speak Asian and Pacific Island languages:!!Speak English "not at all", Census Tract
+                                      # B16044044 = "B16005_044", # Estimate!!Total:!!Foreign born:!!Speak other languages:!!Speak English "not well", Census Tract
+                                      # B16044045 = "B16005_045", # Estimate!!Total:!!Foreign born:!!Speak other languages:!!Speak English "not at all", Census Tract
+                                      #
+                                      #
+                                      # Housing Type & Transportation
+                                      #
+                                      # Multi-Unit Structures
+                                      HouseUnits = "B25032_001", # Total housing units, Block Group
+                                      B25032008 = "B25032_008", # Estimate!!Total:!!Owner-occupied housing units:!!10 to 19, Block Group
+                                      B25032009 = "B25032_009", # Estimate!!Total:!!Owner-occupied housing units:!!20 to 49, Block Group
+                                      B25032010 = "B25032_010", # Estimate!!Total:!!Owner-occupied housing units:!!50 or more, Block Group
+                                      B25032019 = "B25032_019", # Estimate!!Total:!!Renter-occupied housing units:!!10 to 19, Block Group	
+                                      B25032020 = "B25032_020", # Estimate!!Total:!!Renter-occupied housing units:!!20 to 49, Block Group
+                                      B25032021 = "B25032_021", # Estimate!!Total:!!Renter-occupied housing units:!!50 or more, Block Group
+                                      # B25032B007 = "B25032B_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (BLACK OR AFRICAN AMERICAN HOUSEHOLDER), Census Tract
+                                      # B25032B008 = "B25032B_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (BLACK OR AFRICAN AMERICAN HOUSEHOLDER), Census Tract
+                                      # B25032B009 = "B25032B_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (BLACK OR AFRICAN AMERICAN HOUSEHOLDER), Census Tract                             
+                                      # B25032C007 = "B25032C_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (AMERICAN INDIAN AND ALASKA NATIVE HOUSEHOLDER), Census Tract
+                                      # B25032C008 = "B25032C_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (AMERICAN INDIAN AND ALASKA NATIVE HOUSEHOLDER), Census Tract
+                                      # B25032C009 = "B25032C_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (AMERICAN INDIAN AND ALASKA NATIVE HOUSEHOLDER), Census Tract
+                                      # B25032D007 = "B25032D_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (ASIAN HOUSEHOLDER), Census Tract
+                                      # B25032D008 = "B25032D_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (ASIAN HOUSEHOLDER), Census Tract
+                                      # B25032D009 = "B25032D_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (ASIAN HOUSEHOLDER), Census Tract                                      
+                                      # B25032E007 = "B25032E_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (NATIVE HAWAIIAN AND OTHER PACIFIC ISLANDER HOUSEHOLDER), Census Tract
+                                      # B25032E008 = "B25032E_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (NATIVE HAWAIIAN AND OTHER PACIFIC ISLANDER HOUSEHOLDER), Census Tract
+                                      # B25032E009 = "B25032E_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (NATIVE HAWAIIAN AND OTHER PACIFIC ISLANDER HOUSEHOLDER), Census Tract
+                                      # B25032F007 = "B25032F_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (SOME OTHER RACE ALONE HOUSEHOLDER), Census Tract
+                                      # B25032F008 = "B25032F_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (SOME OTHER RACE ALONE HOUSEHOLDER), Census Tract
+                                      # B25032F009 = "B25032F_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (SOME OTHER RACE ALONE HOUSEHOLDER), Census Tract
+                                      # B25032G007 = "B25032G_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (TWO OR MORE RACES ALONE HOUSEHOLDER), Census Tract
+                                      # B25032G008 = "B25032G_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (TWO OR MORE RACES ALONE HOUSEHOLDER), Census Tract
+                                      # B25032G009 = "B25032G_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (TWO OR MORE RACES ALONE HOUSEHOLDER), Census Tract
+                                      # B25032H007 = "B25032H_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (WHITE ALONE, NOT HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032H008 = "B25032H_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (WHITE ALONE, NOT HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032H009 = "B25032H_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (WHITE ALONE, NOT HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032I007 = "B25032I_007", # Estimate!!Total:!!10 to 19, UNITS IN STRUCTURE (HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032I008 = "B25032I_008", # Estimate!!Total:!!20 to 49, UNITS IN STRUCTURE (HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032I009 = "B25032I_009", # Estimate!!Total:!!50 or more, UNITS IN STRUCTURE (HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      #
+                                      # Mobile Homes
+                                      B25032011 = "B25032_011", # Estimate!!Total:!!Owner-occupied housing units:!!Mobile home, Block Group
+                                      B25032022 = "B25032_022", # Estimate!!Total:!!Renter-occupied housing units:!!Mobile home, Block Group
+                                      # B25032B010 = "B25032B_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (BLACK OR AFRICAN AMERICAN ALONE HOUSEHOLDER), Census Tract
+                                      # B25032C010 = "B25032C_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (AMERICAN INDIAN AND ALASKA NATIVE HOUSEHOLDER), Census Tract 
+                                      # B25032D010 = "B25032D_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (ASIAN HOUSEHOLDER), Census Tract
+                                      # B25032E010 = "B25032E_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (NATIVE HAWAIIAN AND OTHER PACIFIC ISLANDER HOUSEHOLDER), Census Tract
+                                      # B25032F010 = "B25032F_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (SOME OTHER RACE ALONE HOUSEHOLDER), Census Tract
+                                      # B25032G010 = "B25032G_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (TWO OR MORE RACES ALONE HOUSEHOLDER), Census Tract
+                                      # B25032H010 = "B25032H_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (WHITE ALONE, NOT HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      # B25032I010 = "B25032I_010", # Estimate!!Total:!!Mobile home, UNITS IN STRUCTURE (HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      #
+                                      # Crowding
+                                      B25014005 = "B25014_005", # Estimate!!Total:!!Owner occupied:!!1.01 to 1.50 occupants per room, Block Group
+                                      B25014006 = "B25014_006", # Estimate!!Total:!!Owner occupied:!!1.51 to 2.00 occupants per room, Block Group	
+                                      B25014007 = "B25014_007", # Estimate!!Total:!!Owner occupied:!!2.01 or more occupants per room, Block Group
+                                      B25014011 = "B25014_011", # Estimate!!Total:!!Renter occupied:!!1.01 to 1.50 occupants per room, Block Group	
+                                      B25014012 = "B25014_012", # Estimate!!Total:!!Renter occupied:!!1.51 to 2.00 occupants per room, Block Group
+                                      B25014013 = "B25014_013", # Estimate!!Total:!!Renter occupied:!!2.01 or more occupants per room, Block Group
+                                      # CrowdWhite = "B25014H_003", # OCCUPANTS PER ROOM (WHITE ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdBlack = "B25014B_003", # OCCUPANTS PER ROOM (BLACK OR AFRICAN AMERICAN ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdAmInd = "B25014C_003", # OCCUPANTS PER ROOM (AMERICAN INDIAN AND ALASKA NATIVE ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdAsian = "B25014D_003", # OCCUPANTS PER ROOM (ASIAN ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdHawai = "B25014E_003", # OCCUPANTS PER ROOM (NATIVE HAWAIIAN AND OTHER PACIFIC ISLANDER ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdOthe1 = "B25014F_003", # OCCUPANTS PER ROOM (SOME OTHER RACE ALONE HOUSEHOLDER), Census Tract
+                                      # CrowdOthe2 = "B25014G_003", # OCCUPANTS PER ROOM (TWO OR MORE RACES HOUSEHOLDER), Census Tract
+                                      # CrowdHispa = "B25014I_003", # OCCUPANTS PER ROOM (HISPANIC OR LATINO HOUSEHOLDER), Census Tract
+                                      #
+                                      # No Vehicle (B25044_003 + B25044_010) / B25044_001
+                                      B25044003 = "B25044_003", # Estimate!!Total:!!Owner occupied:!!No vehicle available, Block Group
+                                      B25044010 = "B25044_010", # Estimate!!Total:!!Renter occupied:!!No vehicle available, Block Group
+                                      B25044001 = "B25044_001", # Total occupied housing units, Block Group
+                                      #
+                                      # Group Quarters B09019_026/TotalPop
+                                      B09019026 = "B09019_026", # Estimate!!Total:!!Group quarters population, Block Group
+                                      #
+                                      # SNAP Benefits
+                                      B22010002 = "B22010_002", # Estimate!!Total:!!Household received Food Stamps/SNAP in the past 12 months:	
+                                      # Immigrant = "B05002_013",
+                                      # SingleParent_Poverty = "B05010_007"
+                                      #
+                                      # Computer Ownership
+                                      B28001011 = "B28001_011", # Estimate!!Total:!!No Computer, Block Group
+                                      B28002013 = "B28002_013" # Estimate!!Total:!!No Internet access, Block Group
+                                      
+), output = "wide")
+```
+
+```{r}
+knox_county_bg <- knox_county_bg %>% mutate(Poverty = (C17002002E + C17002003E)/TotalPopE,
+                                            Unemploy = B23025005E/TotalPopE,
+                                            NoHSDiplom = (B15003002E + B15003003E + B15003004E + B15003005E + B15003006E + B15003007E + B15003008E + B15003009E + B15003010E + B15003011E + B15003012E + B15003013E + B15003014E + B15003015E + B15003016E)/(B15003001E),
+                                            Age65Older = (B01001020E + B01001021E + B01001022E + B01001023E + B01001024E + B01001025E + B01001044E + B01001045E + B01001046E + B01001047E + B01001048E + B01001049E)/TotalPopE,
+                                            Age17Young = (B01001003E + B01001004E + B01001005E + B01001006E + B01001027E + B01001028E + B01001029E + B01001030E)/TotalPopE,
+                                            DisableHH = (B22010003E + B22010006E)/B22010001E,
+                                            SingleHH = (B11003010E + B11003016E)/B11003001E,
+                                            Minority = (1 - (WhiteE/TotalPopE)),
+                                            PoorEnglis = (B16004007E + B16004008E + B16004012E + B16004013E + B16004017E + B16004018E + B16004022E + B16004023E + B16004029E + B16004030E + B16004034E + B16004035E + B16004039E + B16004040E + B16004044E + B16004045E + B16004051E + B16004052E + B16004056E + B16004057E + B16004061E + B16004062E + B16004066E + B16004067E) / TotalPopE,
+                                            MultiUnits = (B25032008E + B25032009E + B25032010E + B25032019E + B25032020E + B25032021E) / HouseUnitsE,
+                                            MobileHome = (B25032011E + B25032022E) / HouseUnitsE,
+                                            Crowding = (B25014005E + B25014006E + B25014007E + B25014011E + B25014012E + B25014013E) / HouseUnitsE,
+                                            NoVehicle = (B25044003E + B25044010E)/B25044001E,
+                                            GroupQuart = B09019026E/TotalPopE,
+                                            SNAPBenefi = B22010002E/B22010001E,
+                                            NoComputer = B28001011E/B22010001E,
+                                            NoInternet = B28002013E/B22010001E
+                                            ) #%>% mutate_all(~replace(., is.na(.), 0))
+knox_county_bg <- st_transform(knox_county_bg, 4326)
+```
+
+```{r}
+knox_county_bg_simple <- knox_county_bg[ , c("GEOID", "NAME", "TotalPopE", "Income_MedE", "Poverty", "Unemploy", "NoHSDiplom", "Age65Older", "Age17Young", "DisableHH", "SingleHH", "Minority", "PoorEnglis", "MultiUnits", "MobileHome", "Crowding", "NoVehicle", "GroupQuart", "SNAPBenefi", "NoComputer", "NoInternet", "geometry")]
+st_write(knox_county_bg_simple, "C:/Users/jfeng/OneDrive - University of Tennessee/Research/Dissertation_Space_Time/Data/Knox_County_BG_Census.shp", append=FALSE)
+st_write(knox_county_bg_simple, "C:/Users/jfeng/OneDrive - University of Tennessee/Research/Dissertation_Space_Time/Data/Knox_County_BG_Census.geojson", delete_dsn=TRUE, delete_layer=TRUE, append=FALSE)
+#knox_county_tract <- knox_county_tract[,-c(seq(4,44,2))]
+```
+
+```{r}
+pal <- colorNumeric(palette = "viridis", domain = knox_county_bg_simple$SNAPBenefi)
+
+knox_county_bg_simple %>%
+    st_transform(crs = "+init=epsg:4326") %>%
+    leaflet(width = "100%") %>%
+    addProviderTiles(provider = "CartoDB.Positron") %>%
+    addPolygons(popup = ~ str_extract(NAME, "^([^,]*)"),
+                stroke = FALSE,
+                smoothFactor = 0,
+                fillOpacity = 0.7,
+                color = ~ pal(knox_county_bg_simple$SNAPBenefi)) %>%
+    addLegend("bottomright", 
+              pal = pal, 
+              values = ~ knox_county_bg_simple$SNAPBenefi,
+              title = "% of People in each Block Group with SNAP Benefits",
+              labFormat = labelFormat(prefix = "%"),
+              opacity = 1)
+```
