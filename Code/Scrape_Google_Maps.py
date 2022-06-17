@@ -81,171 +81,6 @@ def openChromeDriver():
     return driver
 
 
-# TO-DO: Feed in urls of stores to driver.get()
-# Currently, it is based on a placename
-
-# Function to get all reviewer names
-def getReviewer(placename):
-    """Get all reviewer names
-
-    Args:
-        placename (str): Keyword(s) to search in Google Maps
-    """
-    driver = openChromeDriver()
-    driver.get("https://www.google.com/maps/")
-
-    # Search for 'KEYWORDS' in Google Maps, and wait four seconds before loading. 
-    # KEYWORDS must be detailed so that Google Maps show only one result.
-    # (e.g., KEYWORD 7-Eleven will search for many places, but 7-Eleven Downtown Knoxville will only indicate one place)
-
-    # Keyword(s) for search in Google Maps
-    KEYWORDS = placename
-    # Locate the CSS Element for the search box in Google Maps
-    searchbox = driver.find_element_by_css_selector("input#searchboxinput")
-    # Put the input keywords in the search box
-    searchbox.send_keys(KEYWORDS)
-    # Locate the search button
-    searchbutton = driver.find_element_by_css_selector("button#searchbox-searchbutton")
-    # Click on the search button to execute the search
-    searchbutton.click()
-
-    time.sleep(4)
-
-    # Locate the button for all reviews, and wait four seconds before loading
-    reviewbutton = driver.find_element_by_css_selector("button.gm2-button-alt.HHrUdb-v3pZbf")
-    # The CSS element for a direct POI URL, not obtained from a traditional search,: .Yr7JMd-pane-content-ZYyEqf
-    # Click on the button for all reviews to navigate to the URL with all reviews for the location
-    reviewbutton.click()
-
-    time.sleep(4)
-
-    # Load all elements indicating each review, and scroll through all reviews until the end of the review list
-    # `#` sign is for id; `.` sign is for class
-    # siAUzd-neVct: siAUzd-neVct
-    # Yr7JMd-pane: Yr7JMd-pane
-    # Yr7JMd-pane-content-ZYyEqf: Yr7JMd-pane-content-ZYyEqf
-    try:
-        reviewElement = driver.find_elements_by_css_selector("#pane > div.Yr7JMd-pane > div.Yr7JMd-pane-content > div.Yr7JMd-pane-content-ZYyEqf > div.siAUzd-neVct > div.siAUzd-neVct.section-scrollbox > div.siAUzd-neVct")[3]
-    except IndexError:
-        reviewElement = driver.find_elements_by_css_selector("#pane > div.Yr7JMd-pane > div.Yr7JMd-pane-content > div.Yr7JMd-pane-content-ZYyEqf > div.siAUzd-neVct > div.siAUzd-neVct.section-scrollbox > div.siAUzd-neVct")[2]
-
-    # Find all reviews with data-review-id
-    # Store the last review as lastReview
-    # Execute scrolling until the last review (lastReview) is reached
-    # scrollIntoView is a JavaScript method to scroll the parent container
-    previousLastReview=None
-    while True:
-        time.sleep(1.3)
-        reviews = reviewElement.find_elements_by_xpath("//div[contains(@data-review-id, 'Ch')]")
-        lastReview = reviews[-1]
-        driver.execute_script('arguments[0].scrollIntoView(true);', lastReview)
-        if previousLastReview != lastReview:
-            previousLastReview = lastReview
-        else:
-            break
-
-    # Print reviewers
-    for c in reviews:
-        reviewer = c.get_attribute("aria-label")
-        if reviewer is not None:
-            print(reviewer)
-
-    driver.close()
-
-def getReviewerIter(placeList, verbose):
-    isPrintOnConsole = False
-    isPrintSeleniumOper = False
-
-    if verbose == '1':
-        isPrintOnConsole = True
-    elif verbose == '2':
-        isPrintOnConsole = True
-        isPrintSeleniumOper = True
-
-    driver = openChromeDriver()
-    driver.get("https://www.google.com/maps/")
-
-    placeListFile = open("./"+placeList, "r", encoding='UTF-8')
-    reviewerListFile = open("./reviewer.txt", "w")
-    errorListFile = open("./errors.txt", "w")
-
-    for place in tqdm(placeListFile.read().splitlines()):
-        try:
-            # Search for 'KEYWORDS' in google Maps, and waits for 4 seconds to load. 
-            # KEYWORDS must be detailed : so that Google Maps show only one result.
-            # (i.e KEYWORD 세븐일레븐 will search for every place, but 세븐일레븐 혜화점 will indicate only one place)
-            if isPrintOnConsole is True:
-                tqdm.write("["+place+"]")
-
-            reviewerListFile.write("["+place+"]\n")
-
-            searchbox = driver.find_element_by_css_selector("input#searchboxinput")
-            searchbox.clear()
-            searchbox.send_keys(place)
-
-            searchbutton = driver.find_element_by_css_selector("button#searchbox-searchbutton")
-            searchbutton.click()
-
-            time.sleep(4)
-
-            try:
-                # Click All Reviews button, and waits for 4 seconds to load
-                reviewbutton = driver.find_element_by_css_selector("button.gm2-button-alt.HHrUdb-v3pZbf")
-                reviewbutton.click()
-            except NoSuchElementException:
-                if isPrintOnConsole is True:
-                    tqdm.write("No Reviews.\n")
-
-                reviewerListFile.write("No Reviews.\n\n")
-                time.sleep(1)
-                continue
-
-            time.sleep(4)
-
-            # Load all elements indicating each reviews, scroll reviews till the end of review list
-            try:
-                reviewElement = driver.find_elements_by_css_selector("#pane > div.Yr7JMd-pane > div.Yr7JMd-pane-content > div.Yr7JMd-pane-content-ZYyEqf > div.siAUzd-neVct > div.siAUzd-neVct.section-scrollbox > div.siAUzd-neVct")[3]
-            except IndexError:
-                reviewElement = driver.find_elements_by_css_selector("#pane > div.Yr7JMd-pane > div.Yr7JMd-pane-content > div.Yr7JMd-pane-content-ZYyEqf > div.siAUzd-neVct > div.siAUzd-neVct.section-scrollbox > div.siAUzd-neVct")[2]
-
-            previousLastReview=None
-            while True:
-                time.sleep(1.3)
-                reviews = reviewElement.find_elements_by_xpath("//div[contains(@data-review-id, 'Ch')]")
-                lastReview = reviews[-1]
-                driver.execute_script('arguments[0].scrollIntoView(true);', lastReview)
-                if previousLastReview != lastReview:
-                    previousLastReview = lastReview
-                else:
-                    break
-
-            # Print reviewers
-            for c in reviews:
-                reviewer = c.get_attribute("aria-label")
-                if reviewer is not None:
-                    if isPrintOnConsole:
-                        tqdm.write(reviewer)
-                    reviewerListFile.write(reviewer+'\n')
-
-            if isPrintOnConsole:
-                tqdm.write('\n')
-            reviewerListFile.write('\n')
-            backbutton = driver.find_element_by_xpath("//button[@aria-label='Back']")
-            backbutton.click()
-            time.sleep(4)
-        except Exception as e:
-            if isPrintOnConsole:
-                tqdm.write(place+" - Error occured : "+str(e))
-            
-            errorListFile.write("Error occured : "+str(e)+"\n")
-            driver.close()
-            driver = openChromeDriver()
-            driver.get("https://www.google.com/maps/")
-            time.sleep(2)
-
-    driver.close()
-
-
 def getPOI(file):
     # TO-DO: Need to account for lag/high latency when waiting for page to load
     with open(file, "r") as f:
@@ -671,15 +506,11 @@ def crawlhelp():
     print("\nScrape review information from Google Maps.\n")
     print("required arguments:")
     print("  -m [MODE], --mode [MODE]")
-    print("      set mode of scraper. 5 strings are available.")
-    print("        reviewer : get all reviewers from input string which indicates place")
-    print("        reviewer_fromlist : get all reviewers from input file. file must be list of places you want to search for")
+    print("      set mode of scraper. 2 strings are available.")
     print("        poi : get all pois from input string which indicates place")
     print("        review : get all reviews from input string which indicates place")
-    print("        review_fromlist : get all reviews from input file. file must be list of places you want to search for\n")
     print("  -i [FILE or STRING], --input [FILE or STRING]")
     print("      input of scraper. must be string or filename.")
-    print("      [reviewer, review] needs input as string, [reviewer_fromlist, review_fromlist] needs input as filename.")
 
 def main(argv):
     INPUT = None
@@ -710,16 +541,6 @@ def main(argv):
         print("Need -m or --mode.")
         crawlhelp()
         sys.exit(2)
-    elif EXECMODE == "reviewer":
-        if INPUT is None:
-            print("need input as -i or --input.\nInput must be place name you want to search for.")
-        else:
-            getReviewer(INPUT)
-    elif EXECMODE == 'reviewer_fromlist':
-        if INPUT is None:
-            print("need input as -i or --input.\nInput must be filename which contains list of place name you want to search for.")
-        else:
-            getReviewerIter(INPUT, VERBOSE)
     elif EXECMODE == "poi":
         if INPUT is None:
             print("need input as -i or --input. \nInput must be URL you want to search for.")
@@ -730,10 +551,8 @@ def main(argv):
             print("need input as -i or --input.\nInput must be place name you want to search for.")
         else:
             getReview(INPUT)
-    elif EXECMODE == "review_fromlist":
-        print("Under construction...")
     else:
-        print("["+EXECMODE+"] is invalid mode. Must be one of [reviewer, reviewer_fromlist, review, review_fromlist]")
+        print("["+EXECMODE+"] is invalid mode. Must be one of [poi, review]")
         sys.exit(2)
     
 
